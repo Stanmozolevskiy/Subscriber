@@ -40,9 +40,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FirebaseProvider\FirebaseProvider.csproj" />
     <ProjectReference Include="DataProviders\DataProviderInterfaces\DataProviderInterfaces.csproj" />
     <ProjectReference Include="DataProviders\FacebookProvider\FacebookProvider.csproj" />
+    <ProjectReference Include="DataProviders\FirebaseProvider\FirebaseProvider.csproj" />
     <ProjectReference Include="WebAppHelper\WebAppHelper.csproj" />
   </ItemGroup>
 
