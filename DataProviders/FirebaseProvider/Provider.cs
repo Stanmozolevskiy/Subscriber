@@ -5,7 +5,6 @@ using FireSharp.Config;
 using FireSharp.Response;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -34,12 +33,14 @@ namespace FirebaseProvider
             BasePath = configuration["Firebase:BasePath"]
         });
 
-        public Task<PushResponse> Register(FirebaseClient firebaseClient, string phone)
+        public async Task<PushResponse> Register(FirebaseClient firebaseClient, string phone)
         {
-            throw new NotImplementedException();
+            PushResponse data = await firebaseClient.PushAsync(phone, phone);
+            firebaseClient.Dispose();
+            return data;
         }
 
-        public async Task<PushResponse> SendDataToFirebase(FirebaseClient firebaseClient, string subject, Data data)
+        public async Task<PushResponse> SendDataToFirebase<T>(FirebaseClient firebaseClient, string subject, T data)
         {
             PushResponse response = await firebaseClient.PushAsync(subject, data);
             firebaseClient.Dispose();

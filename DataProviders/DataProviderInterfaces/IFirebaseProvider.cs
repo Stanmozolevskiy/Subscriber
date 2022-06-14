@@ -11,7 +11,7 @@ namespace DataProviderInterfaces
     {
         FirebaseClient GetFirebaseClient(IConfiguration configuration);
         Task<Dictionary<string, Data>> GetDataFromFirebase(FirebaseClient firebaseClient, string subject);
-        Task<PushResponse> SendDataToFirebase(FirebaseClient firebaseClient, string subject, Data data);
+        Task<PushResponse> SendDataToFirebase<T>(FirebaseClient firebaseClient, string subject, T data);
         Task<PushResponse> Register(FirebaseClient firebaseClient, string phone);
         Task AddItemToFirebaseList(string subject, List<Data> dataDictionary, Data data, IConfiguration configuration);
     }

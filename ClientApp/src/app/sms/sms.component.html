@@ -1,0 +1,110 @@
+<div>
+    <div class="header">
+        <h3 class="d-inline-block mr-3">Messaging Tools</h3>
+    </div>
+<kendo-tabstrip>
+<kendo-tabstrip-tab title="Send Message" [selected]="true">
+    <ng-template kendoTabContent>
+        <form [formGroup]="smsForm" class="form" (ngSubmit)="onSubmit()">
+            <dl>
+            <dt>
+                To:
+            </dt>
+            <dd>
+                <kendo-textbox formControlName="Recipients" multiple  placeholder="e.g. +19787041084" [style.width]="'90%'"></kendo-textbox>
+            </dd>
+            <dt>
+               Message:
+            </dt>
+            <dd>
+                <kendo-textarea formControlName="Body" placeholder="Please type your message..." [rows]="5" [cols]="124" ></kendo-textarea>
+            </dd>
+            <dt>
+               Attachments:
+            </dt>
+            <dd>
+                <kendo-upload *ngIf="!smsSent" 
+                [saveUrl]="uploadSaveUrl" 
+                [removeUrl]="uploadRemoveUrl" 
+                [restrictions]="myRestrictions"
+                [style.width]="'40%'" ></kendo-upload>
+                <br />
+                <br />
+            </dd>
+            <dd>
+                <button *ngIf="!smsSent" [disabled]="smsForm.disabled || !(smsForm.dirty && smsForm.valid)" kendoButton type="submit">Send</button>
+               
+            </dd>
+            <dd>
+                <div class="form-group" *ngIf="smsSent">
+                    <label><strong>Thank you for your sms message, give use some time to reply.</strong></label>
+                </div>
+            </dd>
+            </dl>
+        </form>
+  </ng-template>
+</kendo-tabstrip-tab>
+</kendo-tabstrip>
+
+<div>
+    <div>
+        <br>
+        <h5 class="d-inline-block mr-3"> My Twilio Accounts</h5>
+    </div>
+    <kendo-grid [kendoGridBinding]="twilioAccounts" >
+        <kendo-grid-column field="Name" title="Name">
+            <ng-template kendoGridFilterMenuTemplate let-filter let-column="column" let-filterService="filterService">
+                <kendo-grid-string-filter-menu [column]="column" [filter]="filter" [filterService]="filterService">
+                </kendo-grid-string-filter-menu>
+            </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column field="Status" title="Status" >
+            <ng-template kendoGridFilterMenuTemplate let-filter let-column="column" let-filterService="filterService">
+                <kendo-grid-string-filter-menu [column]="column" [filter]="filter" [filterService]="filterService">
+                </kendo-grid-string-filter-menu>
+            </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column field="SID" title="SID" >
+            <ng-template kendoGridFilterMenuTemplate let-filter let-column="column" let-filterService="filterService">
+                <kendo-grid-boolean-filter-menu [column]="column" [filter]="filter" [filterService]="filterService">
+                </kendo-grid-boolean-filter-menu>
+            </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column field="Token" title="Token">
+            <ng-template kendoGridFilterMenuTemplate let-filter let-column="column" let-filterService="filterService">
+                <kendo-grid-boolean-filter-menu [column]="column" [filter]="filter" [filterService]="filterService">
+                </kendo-grid-boolean-filter-menu>
+            </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column >
+            <ng-template kendoGridCellTemplate let-dataItem>
+                <a *ngIf="dataItem.Status != 'suspended'" href="" (click)="openModelSuspend($event, dataItem.SID)">Suspend</a>
+                <a *ngIf="dataItem.Status == 'suspended'" href="" (click)="openModelResume($event, dataItem.SID)">Resume</a>
+            </ng-template>
+        </kendo-grid-column>
+    </kendo-grid>
+    <div *ngIf="loading" class="k-i-loading"></div>
+
+    <kendo-dialog title="Suspend Twilio Account" *ngIf="isModalSuspendOpen" >
+        <h6> Suspended accounts can't receive SMS.</h6>
+        <h6> Proceed?</h6>
+        <div *ngIf="modalLoading" class="k-i-loading"></div>
+        <kendo-dialog-actions>
+            <button kendoButton  [disabled]="true">Yes</button>
+            <button kendoButton (click)="closeModel()">No</button>
+        </kendo-dialog-actions>
+    </kendo-dialog>
+
+    <kendo-dialog title="Resume Twilio Account" *ngIf="isModalResumeOpen" >
+        <h6> Resume accounts will start receiving SMS.</h6>
+        <h6> Proceed?</h6>
+        <div *ngIf="modalLoading" class="k-i-loading"></div>
+        <kendo-dialog-actions>
+            <button kendoButton  [disabled]="true">Yes</button>
+            <button kendoButton (click)="closeModel()">No</button>
+        </kendo-dialog-actions>
+    </kendo-dialog>
+
+</div>
+
+</div>

@@ -24,11 +24,11 @@ namespace FacebookProvider
             await page.GoToAsync($"https://www.facebook.com/marketplace/112739992073844/search?query={subject}&exact=false");
 
             //Scroll throught the page and wait to load, take a screenshot
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 6; i++)
             {
                 await page.Mouse.WheelAsync(0, 1000);
                 await page.WaitForNetworkIdleAsync();
-                //await page.ScreenshotAsync($"marketplaceimage{i+1}.jpg");
+                await page.ScreenshotAsync($"marketplaceimage{i+1}.jpg");
             }
 
             List <Data> DataList = new List<Data>();
