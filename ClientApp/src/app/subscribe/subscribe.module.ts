@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { BrowserModule } from '@angular/platform-browser';
+import { BrowserModule } from "@angular/platform-browser";
 import { ButtonsModule } from '@progress/kendo-angular-buttons';
 import { IconsModule } from '@progress/kendo-angular-icons';
 import { InputsModule } from '@progress/kendo-angular-inputs';
@@ -14,29 +14,31 @@ import { DropDownsModule } from '@progress/kendo-angular-dropdowns';
 import { UploadsModule } from '@progress/kendo-angular-upload';
 import {GridModule,ExcelModule} from "@progress/kendo-angular-grid";
 
-import { SmsComponent } from './sms.component';
+import { SubscribeComponent } from './subscribe.component';
+
+
 
 @NgModule({
   declarations: [
-    SmsComponent
+    SubscribeComponent
   ],
   imports: [
     CommonModule,
+    InputsModule,
+    LabelModule,
+    FormsModule,
     BrowserModule,
+    BrowserAnimationsModule,
     ButtonsModule,
     IconsModule,
-    InputsModule,
     IndicatorsModule,
     DialogsModule,
     LayoutModule,
     ReactiveFormsModule,
-    FormsModule,
     DropDownsModule,
-    LabelModule,
-    BrowserAnimationsModule,
     UploadsModule,
     GridModule,
     ExcelModule
   ]
 })
-export class SmsModule { }
+export class SubscribeModule { }

@@ -7,6 +7,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WebAppHelper;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+
 
 namespace Sbuscriber
 {
@@ -21,7 +24,6 @@ namespace Sbuscriber
             services
                 .ConfigureMVC()
                 .AddControllers();
-
 
             services.AddSpaStaticFiles(configuration => configuration.RootPath = "ClientApp/dist");
             services.AddHttpContextAccessor();
@@ -78,5 +80,20 @@ namespace Sbuscriber
 
         private readonly IConfiguration configuration;
     }
-  
+
+    public static class ConfigurationExtensions
+    {
+        public static IServiceCollection ConfigureMVC(this IServiceCollection services)
+        {
+            services
+                .AddMvc(options => options.RespectBrowserAcceptHeader = true)
+                .AddNewtonsoftJson(options =>
+                {
+                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                    options.SerializerSettings.ContractResolver = new DefaultContractResolver();
+                });
+            return services;
+        }
+    }
+
 }

@@ -1,0 +1,64 @@
+
+
+        <div class="header">
+          <h3 class="d-inline-block mr-3">Subscribe</h3>
+        </div>
+        
+        <kendo-tabstrip>
+            <kendo-tabstrip-tab title="Find Subscription" [selected]="true">
+                <ng-template kendoTabContent>
+                    
+                    <form [formGroup]="oldSubscribtinForm" class="form" (ngSubmit)="onCheckSubscription()">
+                        <dl>
+                            <dd>
+                                <h4><strong>To see your subscriptions please enter your phone number</strong></h4>
+                                
+                            </dd>
+                            <dt>
+                                
+                            </dt>
+                            <dd>
+                                <kendo-textbox formControlName="Phone" multiple [style.width.px]="200"
+                                    [clearButton]="true" placeholder="e.g: 9787041084" [style.width]="'40%'"></kendo-textbox>
+                            </dd>
+                            <dd> 
+                                <br />
+                                <br />
+                                <button kendoButton [disabled]="oldSubscribtinForm.disabled || !(oldSubscribtinForm.dirty && oldSubscribtinForm.valid)"
+                                     type="submit">Find</button>
+                            </dd>
+                        </dl>
+                    </form>
+
+                </ng-template>
+            </kendo-tabstrip-tab>
+
+            <kendo-tabstrip-tab title="Start New Subscription" >
+                <ng-template kendoTabContent>
+                    
+                    <form [formGroup]="newSubscribtinForm" class="form" (ngSubmit)="onSubscribe()">
+                        <dl>
+                            <dd>
+                                <h4><strong>To start a subscription please enter your phone in the following format</strong></h4>
+                                
+                            </dd>
+                            <dt>
+                                
+                            </dt>
+                            <dd>
+                                <kendo-textbox formControlName="Phone" multiple [style.width.px]="200"
+                                    [clearButton]="true" placeholder="e.g: 9787041084" [style.width]="'40%'"></kendo-textbox>
+                            </dd>
+                            <dd> 
+                                <br />
+                                <br />
+                                <button kendoButton [disabled]="newSubscribtinForm.disabled || !(newSubscribtinForm.dirty && newSubscribtinForm.valid)" type="submit">Subscribe</button>
+                            </dd>
+                        </dl>
+                    </form>
+
+                </ng-template>
+            </kendo-tabstrip-tab>
+
+        </kendo-tabstrip>
+

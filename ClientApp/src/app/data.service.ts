@@ -1,3 +1,4 @@
+import { Subscribe } from './models/subscribe';
 import { SMS, TwilioAccount } from './models/sms';
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
@@ -16,6 +17,14 @@ export class DataService{
 
   getSummary(): Observable<TwilioAccount[]> {
      return this.http.get<TwilioAccount[]>(`sms`, { headers: this.headers });
+  }
+
+  subscribePhone(phone: string) {
+    return this.http.post<Subscribe>('subscriber/register', phone, {headers: this.headers});
+  }
+
+  getPhoneSubscription(phone: string) {
+    return this.http.post<Subscribe>('subscriber/getSubscription', phone, {headers: this.headers});
   }
 
   private headers: HttpHeaders = new HttpHeaders({ 'Content-Type': 'application/json' });

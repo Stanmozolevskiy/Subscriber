@@ -28,7 +28,7 @@ namespace FacebookProvider
             {
                 await page.Mouse.WheelAsync(0, 1000);
                 await page.WaitForNetworkIdleAsync();
-                await page.ScreenshotAsync($"marketplaceimage{i+1}.jpg");
+                //await page.ScreenshotAsync($"marketplaceimage{i+1}.jpg");
             }
 
             List <Data> DataList = new List<Data>();

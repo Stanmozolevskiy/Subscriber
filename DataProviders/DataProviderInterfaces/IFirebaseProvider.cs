@@ -12,7 +12,10 @@ namespace DataProviderInterfaces
         FirebaseClient GetFirebaseClient(IConfiguration configuration);
         Task<Dictionary<string, Data>> GetDataFromFirebase(FirebaseClient firebaseClient, string subject);
         Task<PushResponse> SendDataToFirebase<T>(FirebaseClient firebaseClient, string subject, T data);
-        Task<PushResponse> Register(FirebaseClient firebaseClient, string phone);
+        Task<string> Register(FirebaseClient firebaseClient, string phone);
+        Task<Dictionary<string, SubscriptionName>> GetSubscriptions(FirebaseClient firebaseClient, string phone);
         Task AddItemToFirebaseList(string subject, List<Data> dataDictionary, Data data, IConfiguration configuration);
+        Task<string> Subscribe(Credantials credantials, IConfiguration configuration);
+        Task<string> Unsubscribe(Credantials credantials, IConfiguration configuration);
     }
 }
