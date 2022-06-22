@@ -1,0 +1,26 @@
+<h2>{{subscription}}</h2>
+
+
+<div *ngIf="loading">
+    <dl>
+        <dd>
+            <h4 >{{message}}</h4>
+        </dd>
+        <dd>
+            <!-- <button kendoButton (click)="getData()">Refresh</button> -->
+        </dd>
+    </dl>
+    <div class="k-i-loading"></div>
+    <br>
+    
+</div>
+
+<div>
+    
+</div>
+<div class="row">
+    <div class="col-md-3 col-lg-3 px-2" *ngFor="let item of data" >
+        <a [innerHTML]="item.Body" href="{{item.Url}}"> </a>
+    </div>
+</div>
+

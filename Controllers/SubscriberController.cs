@@ -28,16 +28,32 @@ namespace Sbuscriber.Controllers
             Ok(await facebookProvider.GetDataFromFacebook(await facebookProvider.GetBrowserPage(), subject));
 
         [HttpPost("getDataListFromFirebase")]
-        public async Task<IActionResult> GetDataFromFirebase([FromBody] string subject)=>
-            Ok(await firebaseProvider.GetDataFromFirebase(firebaseProvider.GetFirebaseClient(configuration), subject));
+        public async Task<IActionResult> GetDataFromFirebase([FromBody] string subject)
+        {
+            Dictionary<string, Data> response = await firebaseProvider
+                                                      .GetDataFromFirebase(firebaseProvider
+                                                      .GetFirebaseClient(configuration), subject);
+            if (response?.Count > 0)
+                return Ok(response?.Values.ToList<Data>());
+
+            return Ok("Please wait one minute for data to populate");
+        }
         
         [HttpPost("postDataFromFirebase")]
         public async Task<IActionResult> PostDataToFirebase(string subject, Data data)=>
             Ok(await firebaseProvider.SendDataToFirebase(firebaseProvider.GetFirebaseClient(configuration), subject, data));
 
         [HttpPost("getSubscription")]
-        public async Task<IActionResult> GetSubscriptions([FromBody] string phone) =>
-            Ok(await firebaseProvider.GetSubscriptions(firebaseProvider.GetFirebaseClient(configuration), phone));
+        public async Task<IActionResult> GetSubscriptions([FromBody] string phone)
+        {
+            Dictionary<string, SubscriptionName> response = (await firebaseProvider
+                                                                .GetSubscriptions(firebaseProvider
+                                                                .GetFirebaseClient(configuration), phone));
+            if (response?.Count > 0)
+               return Ok(response.Values?.ToList<SubscriptionName>());
+
+           return Ok("Please wait one minute for data to populate");
+        }
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] string phone) =>

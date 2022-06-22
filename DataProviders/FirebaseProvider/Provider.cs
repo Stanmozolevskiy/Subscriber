@@ -107,11 +107,12 @@ namespace FirebaseProvider
                     int randomTime = new Random().Next(1, 2);
                     await populateFacebookData(firebaseClent, path, credantials, configuration);
                     await Task.Delay(randomTime * 100000, cancellationToken.Token);
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        firebaseClent.Dispose();
-                        break;
-                    }
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            Unsubscribe(credantials, configuration);
+                            firebaseClent.Dispose();
+                            break;
+                        }
                 }
             });
 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed

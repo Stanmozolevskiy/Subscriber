@@ -4,15 +4,14 @@
           <h3 class="d-inline-block mr-3">Subscribe</h3>
         </div>
         
-        <kendo-tabstrip>
-            <kendo-tabstrip-tab title="Find Subscription" [selected]="true">
+        <kendo-tabstrip *ngIf="!number">
+            <kendo-tabstrip-tab title="Login" [selected]="true">
                 <ng-template kendoTabContent>
                     
-                    <form [formGroup]="oldSubscribtinForm" class="form" (ngSubmit)="onCheckSubscription()">
+                    <form [formGroup]="regestrarionForm" class="form" (ngSubmit)="onRegester()">
                         <dl>
                             <dd>
-                                <h4><strong>To see your subscriptions please enter your phone number</strong></h4>
-                                
+                                <h5><strong>Enter your phone</strong></h5>
                             </dd>
                             <dt>
                                 
@@ -24,35 +23,7 @@
                             <dd> 
                                 <br />
                                 <br />
-                                <button kendoButton [disabled]="oldSubscribtinForm.disabled || !(oldSubscribtinForm.dirty && oldSubscribtinForm.valid)"
-                                     type="submit">Find</button>
-                            </dd>
-                        </dl>
-                    </form>
-
-                </ng-template>
-            </kendo-tabstrip-tab>
-
-            <kendo-tabstrip-tab title="Start New Subscription" >
-                <ng-template kendoTabContent>
-                    
-                    <form [formGroup]="newSubscribtinForm" class="form" (ngSubmit)="onSubscribe()">
-                        <dl>
-                            <dd>
-                                <h4><strong>To start a subscription please enter your phone in the following format</strong></h4>
-                                
-                            </dd>
-                            <dt>
-                                
-                            </dt>
-                            <dd>
-                                <kendo-textbox formControlName="Phone" multiple [style.width.px]="200"
-                                    [clearButton]="true" placeholder="e.g: 9787041084" [style.width]="'40%'"></kendo-textbox>
-                            </dd>
-                            <dd> 
-                                <br />
-                                <br />
-                                <button kendoButton [disabled]="newSubscribtinForm.disabled || !(newSubscribtinForm.dirty && newSubscribtinForm.valid)" type="submit">Subscribe</button>
+                                <button kendoButton [disabled]="regestrarionForm.disabled || !(regestrarionForm.dirty && regestrarionForm.valid)" type="submit">Subscribe</button>
                             </dd>
                         </dl>
                     </form>
@@ -61,4 +32,70 @@
             </kendo-tabstrip-tab>
 
         </kendo-tabstrip>
+
+        <div *ngIf="number">
+            <dl>
+                <dd>
+                    <h5 class="d-inline-block mr-3"> Change the Regestration number</h5>
+                </dd>
+                <dd>
+                    <button kendoButton (click)="OnRegestrationNumberChange()">Change</button>
+                </dd>
+            </dl>
+            <br>
+            
+        </div>
+
+        <div *ngIf="loading" class="k-i-loading"></div>
+        <div *ngIf="subscriptions && number">
+            <div>
+                <br>
+                <h5 class="d-inline-block mr-3"> My Subscriptions</h5>
+            </div>
+            
+            <a  href="" (click)="openModelCreate($event)">Create New</a>
+            <kendo-grid [kendoGridBinding]="subscriptions" >
+                <kendo-grid-column field="Name" title="Name">
+                    <ng-template kendoGridCellTemplate let-dataItem>
+                        <a routerLink="/subscriptions/{{number}}/{{dataItem.Name}}">{{dataItem.Name}}</a>
+                    </ng-template>
+                </kendo-grid-column>
+                
+                <kendo-grid-column >
+                    <ng-template kendoGridCellTemplate let-dataItem>
+                        <a  href="" (click)="openModelUnsubscribe($event, dataItem.Name)">Suspend</a>
+                    </ng-template>
+                </kendo-grid-column>
+            </kendo-grid>
+           
+        
+            <kendo-dialog title="Suspend Subscription" *ngIf="isModalUnsubscribeOpen" >
+                <h6> Remove subscription for this <strong>{{unSubscribeSubject}}</strong>?</h6>
+                <br>
+                <br>
+                <kendo-dialog-actions>
+                    <button kendoButton (click)="onUnsubscribe()">Yes</button>
+                    <button kendoButton (click)="closeModel()">No</button>
+                </kendo-dialog-actions>
+            </kendo-dialog>
+
+            <kendo-dialog title="New Subscription" *ngIf="isModalNewSubscriptionOpen" >
+                <h6> What keyword do you want to subscribe for ?</h6>
+                <form [formGroup]="newSubscription" class="form" (ngSubmit)="onSubscribe()">
+
+                    <kendo-textbox formControlName="Subject" multiple [style.width.px]="200"
+                    [clearButton]="true" placeholder="e.g: surfboard" [style.width]="'40%'"></kendo-textbox>
+                    <br>
+                    <br>
+                    
+                    <kendo-dialog-actions>
+                        <button kendoButton [disabled]="newSubscription.disabled || !(newSubscription.dirty && newSubscription.valid)" type="submit">Yes</button>
+                        <button kendoButton (click)="closeModel()">No</button>
+                    </kendo-dialog-actions>
+
+                </form>
+            </kendo-dialog>
+        
+        </div>
+
 

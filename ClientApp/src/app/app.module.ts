@@ -9,7 +9,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { NavMenuComponent } from './nav-menu/nav-menu.component';
-import { SmsModule } from './sms/sms.module';
+import { SubscriptionsModule } from './subscriptions/subscriptions.module';
 
 @NgModule({
   declarations: [
@@ -23,9 +23,10 @@ import { SmsModule } from './sms/sms.module';
     FormsModule,
     CommonModule,
     BrowserAnimationsModule,
-    SmsModule,
-    SubscribeModule
+    SubscribeModule,
+    SubscriptionsModule
   ],
+  
   providers: [],
   bootstrap: [AppComponent]
 })

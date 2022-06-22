@@ -15,6 +15,7 @@ import { UploadsModule } from '@progress/kendo-angular-upload';
 import {GridModule,ExcelModule} from "@progress/kendo-angular-grid";
 
 import { SubscribeComponent } from './subscribe.component';
+import { AppRoutingModule } from '../app-routing.module';
 
 
 
@@ -38,7 +39,8 @@ import { SubscribeComponent } from './subscribe.component';
     DropDownsModule,
     UploadsModule,
     GridModule,
-    ExcelModule
+    ExcelModule,
+    AppRoutingModule,
   ]
 })
 export class SubscribeModule { }
