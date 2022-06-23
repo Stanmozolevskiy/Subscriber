@@ -6,9 +6,6 @@ using Microsoft.Extensions.Configuration;
 using DataProviderInterfaces;
 using DataModels;
 using System.Linq;
-using Newtonsoft.Json;
-using System;
-using System.Threading;
 
 namespace Sbuscriber.Controllers
 {

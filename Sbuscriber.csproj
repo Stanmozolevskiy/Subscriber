@@ -21,9 +21,11 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.17" />
     <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.17" />
+    <PackageReference Include="MyLibraries" Version="1.0.8" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="Numind.AspNetCore.SpaServices.Extensions" Version="1.0.1" />
     <PackageReference Include="PuppeteerSharp" Version="7.0.0" />
+    <PackageReference Include="Twilio" Version="5.75.3" />
   </ItemGroup>
 
   <ItemGroup>

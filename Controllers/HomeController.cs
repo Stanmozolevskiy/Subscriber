@@ -7,7 +7,6 @@ namespace Sbuscriber.Controllers
 	public class HomeController : ControllerBase
 	{
 
-
 		[HttpGet("{input}")]
 		public IActionResult Eco(string input) => Ok(input);
 
