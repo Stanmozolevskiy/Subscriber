@@ -16,9 +16,9 @@ When there are new listings available you will get an SMS/Email right away, that
 
 In this project I used the Provider architecture along with the dependency injection provided by .net5.
 
-![alt text](https://github.com/Stanmozolevskiy/Subscriber/AplicationLogic.jpg)
+![alt text](https://github.com/Stanmozolevskiy/Subscriber/blob/main/AplicationLogic.jpg)
 
 <br>
 <br>
 
-![alt text](https://github.com/Stanmozolevskiy/Subscriber/Subscriber_Arcitecture.jpg)
+![alt text](https://github.com/Stanmozolevskiy/Subscriber/blob/main/Subscriber_Arcitecture.jpg)
