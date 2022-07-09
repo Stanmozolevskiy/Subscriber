@@ -19,16 +19,32 @@ namespace FacebookProvider
         }
 
         public async Task<List<Data>> GetDataFromFacebook(Page page, string subject)
-        {   
-            //Go to the page
-            await page.GoToAsync($"https://www.facebook.com/marketplace/112739992073844/search?query={subject}&exact=false");
+        {
+
+            //Go to the page 
+            await page.GoToAsync($"https://www.facebook.com/marketplace/112739992073844/search?sortBy=best_match&query=1%20bedroom%20apartment%20rent&exact=false");
+                
+            //set the distance for future
+            //await page.WaitForNetworkIdleAsync();
+            //await page.Mouse.ClickAsync(100, 150);
+            //await page.WaitForNetworkIdleAsync();
+            //await page.Mouse.ClickAsync(200, 250);
+            //await page.WaitForNetworkIdleAsync();
+            //await page.Keyboard.TypeAsync("10");
+            //await page.WaitForNetworkIdleAsync();
+            //await page.Keyboard.PressAsync("Enter");
+            //await page.WaitForNetworkIdleAsync();
+            //await page.Mouse.WheelAsync(0, 1000);
+            //await page.WaitForNetworkIdleAsync();
+            //await page.Mouse.ClickAsync(600, 500);
 
             //Scroll throught the page and wait to load, take a screenshot
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < 2; i++)
             {
                 await page.Mouse.WheelAsync(0, 1000);
                 await page.WaitForNetworkIdleAsync();
-                //await page.ScreenshotAsync($"marketplaceimage{i+1}.jpg");
+
+                await page.ScreenshotAsync($"{System.IO.Directory.CreateDirectory("Attachments").Name}/marketplaceimage.jpg");
             }
 
             List <Data> DataList = new List<Data>();
@@ -42,9 +58,9 @@ namespace FacebookProvider
             foreach (Data result in await page.EvaluateFunctionAsync<Data[]>(jsCode))
                 DataList.Add(result);
 
-
             await page.CloseAsync();
             return DataList;
         }
+
     }
 }

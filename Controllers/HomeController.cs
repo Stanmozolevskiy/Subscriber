@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Sbuscriber.Controllers
+namespace Subscriber.Controllers
 {
 	[Route("[controller]"), ApiController, AllowAnonymous]
 	public class HomeController : ControllerBase

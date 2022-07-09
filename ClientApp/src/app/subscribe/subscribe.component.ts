@@ -45,7 +45,7 @@ export class SubscribeComponent implements OnInit {
     this.updateGrid();
   }
 
-  OnRegestrationNumberChange(){
+  onRegestrationNumberChange(){
     this.number = null;
     this.regestrarionForm.reset();
     this.regestrarionForm.enable();
@@ -57,8 +57,8 @@ export class SubscribeComponent implements OnInit {
     this.isModalNewSubscriptionOpen = true;
   }
   onSubscribe(){
-    console.log(`${this.newSubscription.get("Subject")?.value}`); 
     this.dataService.subscribe( new Credantials(this.number, `${this.newSubscription.get("Subject")?.value}`)).subscribe();
+    this.newSubscription.reset();
     this.closeModel();
     this.updateGrid();
   }

@@ -1,10 +1,8 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
-    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
     <IsPackable>false</IsPackable>
     <SpaRoot>ClientApp\</SpaRoot>
@@ -12,41 +10,49 @@
 
     <!-- Set this to true if you enable server-side prerendering -->
     <BuildServerSideRenderer>false</BuildServerSideRenderer>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <NoWarn>1701;1702</NoWarn>
+    <UserSecretsId>b79ec703-b851-4b0b-915e-161348cf1874</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <DockerfileContext>.</DockerfileContext>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.17" />
-    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.17" />
-    <PackageReference Include="MyLibraries" Version="1.0.8" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Numind.AspNetCore.SpaServices.Extensions" Version="1.0.1" />
-    <PackageReference Include="PuppeteerSharp" Version="7.0.0" />
-    <PackageReference Include="Twilio" Version="5.75.3" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="5.0.7" />
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.10.14" />
   </ItemGroup>
 
   <ItemGroup>
     <!-- Don't publish the SPA source files, but do show them in the project files list -->
+    <Compile Remove="Attachments\**" />
     <Compile Remove="DataProviders\**" />
+    <Compile Remove="Pages\**" />
     <Compile Remove="WebAppHelper\**" />
     <Content Remove="$(SpaRoot)**" />
+    <Content Remove="Attachments\**" />
     <Content Remove="DataProviders\**" />
+    <Content Remove="Pages\**" />
     <Content Remove="WebAppHelper\**" />
+    <EmbeddedResource Remove="Attachments\**" />
     <EmbeddedResource Remove="DataProviders\**" />
+    <EmbeddedResource Remove="Pages\**" />
     <EmbeddedResource Remove="WebAppHelper\**" />
     <None Remove="$(SpaRoot)**" />
+    <None Remove="Attachments\**" />
     <None Remove="DataProviders\**" />
+    <None Remove="Pages\**" />
     <None Remove="WebAppHelper\**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Controllers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="DataProviders\DataModels\DataModels.csproj" />
     <ProjectReference Include="DataProviders\DataProviderInterfaces\DataProviderInterfaces.csproj" />
     <ProjectReference Include="DataProviders\FacebookProvider\FacebookProvider.csproj" />
     <ProjectReference Include="DataProviders\FirebaseProvider\FirebaseProvider.csproj" />
+    <ProjectReference Include="DataProviders\TwilioProvider\TwilioProvider.csproj" />
     <ProjectReference Include="WebAppHelper\WebAppHelper.csproj" />
   </ItemGroup>
 

@@ -7,11 +7,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using WebAppHelper;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
-
-namespace Sbuscriber
+namespace Subscriber
 {
     public class Startup
     {
@@ -23,25 +20,25 @@ namespace Sbuscriber
         {
             services
                 .ConfigureMVC()
-                .AddControllers();
-
+                .AddControllersWithViews();
             services.AddSpaStaticFiles(configuration => configuration.RootPath = "ClientApp/dist");
-            services.AddHttpContextAccessor();
-            services.AddHttpClient();
 
 
+            services.AddScoped<ISmsProvider, TwilioProvider.Provider>();
             services.AddScoped<IFacebookProvider, FacebookProvider.Provider>();
             services.AddScoped<IFirebaseProvider, FirebaseProvider.Provider>();
         }
+
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-
-
             app.Use(async (context, next) =>
             {
                 context.Request.EnableBuffering();
                 await next();
             });
+
+            app.UseMiddleware<ExceptionMiddleware>();
 
             if (env.IsDevelopment())
             {
@@ -57,10 +54,18 @@ namespace Sbuscriber
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             if (!env.IsDevelopment())
+            {
                 app.UseSpaStaticFiles();
+            }
 
             app.UseRouting();
-            app.UseEndpoints(endpoints => endpoints.MapControllers());
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller}/{action=Index}/{id?}");
+            });
 
             app.UseSpa(spa =>
             {
@@ -74,26 +79,7 @@ namespace Sbuscriber
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
-
         }
-     
-
         private readonly IConfiguration configuration;
     }
-
-    public static class ConfigurationExtensions
-    {
-        public static IServiceCollection ConfigureMVC(this IServiceCollection services)
-        {
-            services
-                .AddMvc(options => options.RespectBrowserAcceptHeader = true)
-                .AddNewtonsoftJson(options =>
-                {
-                    options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-                    options.SerializerSettings.ContractResolver = new DefaultContractResolver();
-                });
-            return services;
-        }
-    }
-
 }

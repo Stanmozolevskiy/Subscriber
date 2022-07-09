@@ -1,7 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-
+using System;
 
 namespace WebAppHelper
 {
@@ -18,5 +19,13 @@ namespace WebAppHelper
                 });
             return services;
         }
+        public static string GetRequestURL(this HttpContext context) =>
+            (new UriBuilder
+            {
+                Scheme = context.Request.Scheme,
+                Host = context.Request.Host.Value,
+                Path = $"{context.Request.PathBase}{context.Request.Path}",
+                Query = context.Request.QueryString.Value
+            }).ToString();
     }
 }

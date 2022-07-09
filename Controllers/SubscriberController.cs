@@ -7,12 +7,11 @@ using DataProviderInterfaces;
 using DataModels;
 using System.Linq;
 
-namespace Sbuscriber.Controllers
+namespace Subscriber.Controllers
 {
     [Route("[controller]"), ApiController, AllowAnonymous]
     public class SubscriberController: ControllerBase
     {
-
         public SubscriberController(IConfiguration configuration, IFacebookProvider facebookProvider, IFirebaseProvider firebaseProvider)
         {
             this.firebaseProvider = firebaseProvider;
@@ -29,7 +28,7 @@ namespace Sbuscriber.Controllers
         {
             Dictionary<string, Data> response = await firebaseProvider
                                                       .GetDataFromFirebase(firebaseProvider
-                                                      .GetFirebaseClient(configuration), subject);
+                                                      .GetFirebaseClient(), subject);
             if (response?.Count > 0)
                 return Ok(response?.Values.ToList<Data>());
 
@@ -38,14 +37,14 @@ namespace Sbuscriber.Controllers
         
         [HttpPost("postDataFromFirebase")]
         public async Task<IActionResult> PostDataToFirebase(string subject, Data data)=>
-            Ok(await firebaseProvider.SendDataToFirebase(firebaseProvider.GetFirebaseClient(configuration), subject, data));
+            Ok(await firebaseProvider.SendDataToFirebase(firebaseProvider.GetFirebaseClient(), subject, data));
 
         [HttpPost("getSubscription")]
         public async Task<IActionResult> GetSubscriptions([FromBody] string phone)
         {
             Dictionary<string, SubscriptionName> response = (await firebaseProvider
                                                                 .GetSubscriptions(firebaseProvider
-                                                                .GetFirebaseClient(configuration), phone));
+                                                                .GetFirebaseClient(), phone));
             if (response?.Count > 0)
                return Ok(response.Values?.ToList<SubscriptionName>());
 
@@ -54,15 +53,19 @@ namespace Sbuscriber.Controllers
 
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] string phone) =>
-          Ok(await firebaseProvider.Register(firebaseProvider.GetFirebaseClient(configuration), phone));
+          Ok(await firebaseProvider.Register(firebaseProvider.GetFirebaseClient(), phone));
 
         [HttpPost("subscribe")]
-        public async Task<IActionResult> Subscribe([FromBody] Credantials credantials) =>
-            Ok(await firebaseProvider.Subscribe(credantials, configuration));
+        public async Task<IActionResult> Subscribe([FromBody] Credantials credantials)
+        {
+            var data = await firebaseProvider.Subscribe(credantials);
+            await firebaseProvider.UploadAttachmentsToFirebase();
+            return Ok(data);
+        }
         
         [HttpPost("undubscribe")]
         public async Task<IActionResult> Undubscribe([FromBody] Credantials credantials) =>
-            Ok(await firebaseProvider.Unsubscribe(credantials, configuration));
+            Ok(await firebaseProvider.Unsubscribe(credantials));
         
 
 

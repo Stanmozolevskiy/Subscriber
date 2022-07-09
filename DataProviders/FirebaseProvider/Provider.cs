@@ -1,13 +1,16 @@
 ﻿using DataModels;
 using DataProviderInterfaces;
+using Firebase.Auth;
+using Firebase.Storage;
 using FireSharp;
-using FireSharp.Config;
 using FireSharp.Response;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,14 +18,27 @@ namespace FirebaseProvider
 {
     public class Provider : IFirebaseProvider
     {
-        public Provider(IFacebookProvider facebookProvider)
+        public Provider(IFacebookProvider facebookProvider, IConfiguration configuration, ISmsProvider smsProvider)
         {
             this.facebookProvider = facebookProvider;
+            this.smsProvider = smsProvider;
+            this.configuration = configuration;
+            networkCredential = new NetworkCredential(configuration["Settings:Tvilio:accountSid"],
+                configuration["Settings:Tvilio:authToken"], configuration["Settings:Tvilio:domain"]);
         }
-        public async Task AddItemToFirebaseList(string subject, List<Data> dataDictionary, Data data, IConfiguration configuration)
+        public async Task AddItemToFirebaseList(string subject, List<Data> dataDictionary, Data data, Credantials credantials, int index)
         {
-            if(!dataDictionary.Any(x => x.Url == data.Url))
-             await SendDataToFirebase(GetFirebaseClient(configuration), subject, data);
+            if (!dataDictionary.Any(x => x.Url == data.Url))
+            {
+                FirebaseClient client = GetFirebaseClient();
+                await SendDataToFirebase(client, subject, data);
+                if (index >= 3)
+                 await smsProvider.Send(networkCredential, new MyLibraries.SMSMessage()
+                    { Recipients = new List<MyLibraries.Recipient>() 
+                    { new MyLibraries.Recipient(credantials.Phone,
+                    $"new {credantials.Subject}: {data.Url}") }});
+                client.Dispose();
+            }
         }
 
         public async Task<Dictionary<string, Data>> GetDataFromFirebase(FirebaseClient firebaseClient, string subject)
@@ -33,7 +49,7 @@ namespace FirebaseProvider
             return data;
         }
 
-        public FirebaseClient GetFirebaseClient(IConfiguration configuration) => new FirebaseClient(new FirebaseConfig
+        public FirebaseClient GetFirebaseClient() => new FirebaseClient(new FireSharp.Config.FirebaseConfig
         {
             AuthSecret = configuration["Firebase:AuthSecret"],
             BasePath = configuration["Firebase:BasePath"]
@@ -57,9 +73,9 @@ namespace FirebaseProvider
         {
             if(phone.Length == 10)
             {
-            FirebaseResponse resp = await firebaseClient.GetAsync($"{phone}/subscriptions");
-            Dictionary<string, SubscriptionName> data = JsonConvert.DeserializeObject<Dictionary<string, SubscriptionName>>(resp.Body);
-            firebaseClient.Dispose();
+                FirebaseResponse resp = await firebaseClient.GetAsync($"{phone}/subscriptions");
+                Dictionary<string, SubscriptionName> data = JsonConvert.DeserializeObject<Dictionary<string, SubscriptionName>>(resp.Body);
+                firebaseClient.Dispose();
                 return data;
             }
             return null;
@@ -72,9 +88,9 @@ namespace FirebaseProvider
             return response;
         }
 
-        public async Task<string> Unsubscribe(Credantials credantials, IConfiguration configuration)
+        public async Task<string> Unsubscribe(Credantials credantials)
         {
-            FireSharp.FirebaseClient firebaseClent = GetFirebaseClient(configuration);
+            FireSharp.FirebaseClient firebaseClent = GetFirebaseClient();
             KeyValuePair<string, SubscriptionName> itemToUnsubscribe = (await isSubscribed(firebaseClent, credantials));
             // Remove a record to a subscription folder in the db 
             await firebaseClent.DeleteAsync($"{credantials.Phone}/subscriptions/{itemToUnsubscribe.Key}");
@@ -84,10 +100,10 @@ namespace FirebaseProvider
             return "Unsubscribed";
         }
 
-        public async Task<string> Subscribe(Credantials credantials, IConfiguration configuration)
+        public async Task<string> Subscribe(Credantials credantials)
         {
             string path = $"{credantials.Phone}/{credantials.Subject}";
-            FireSharp.FirebaseClient firebaseClent = GetFirebaseClient(configuration);
+            FireSharp.FirebaseClient firebaseClent = GetFirebaseClient();
 
             // Add a record to a subscription folder in the db 
             await SendDataToFirebase(firebaseClent, $"{credantials.Phone}/subscriptions", new SubscriptionName(credantials.Subject));
@@ -98,18 +114,19 @@ namespace FirebaseProvider
             {
                 //check if still subscribed
                 CancellationTokenSource cancellationToken = new CancellationTokenSource();
-
-                while ((await isSubscribed(firebaseClent, credantials)).Value is not null)
+                int index = 0;
+                string isCanceled = (await isSubscribed(firebaseClent, credantials)).Value.Name;
+                while (isCanceled is not null)
                 {
-                    if ((await isSubscribed(firebaseClent, credantials)).Value is not null)
+                    if (isCanceled is null)
                         cancellationToken.Cancel();
-
-                    int randomTime = new Random().Next(1, 2);
-                    await populateFacebookData(firebaseClent, path, credantials, configuration);
-                    await Task.Delay(randomTime * 100000, cancellationToken.Token);
+                    index++;
+                    int randomTime = new Random().Next(1, 10);
+                    await populateFacebookDataAndUpdateDb(firebaseClent, path, credantials, index);
+                    await Task.Delay(randomTime * 100000 , cancellationToken.Token);
                         if (cancellationToken.IsCancellationRequested)
                         {
-                            Unsubscribe(credantials, configuration);
+                            Unsubscribe(credantials);
                             firebaseClent.Dispose();
                             break;
                         }
@@ -120,7 +137,45 @@ namespace FirebaseProvider
         }
 
 
-        private async Task populateFacebookData(FirebaseClient firebaseClent, string path, Credantials credantials, IConfiguration configuration)
+
+        public async Task<bool> DeleteFileLocally(string fileName)
+        {
+            await Task.Yield();
+            if (File.Exists(Path.Combine("Attachments", fileName)))
+                File.Delete(Path.Combine("Attachments", fileName));
+            return true;
+        }
+
+        public async Task<List<Uri>> UploadAttachmentsToFirebase()
+        {
+            FirebaseAuthLink firebaseAuthLink = await new FirebaseAuthProvider(
+                new FirebaseConfig(configuration["Settings:Firebase:apiKey"])).SignInWithEmailAndPasswordAsync(
+            configuration["Settings:Firebase:authEmail"], configuration["Settings:Firebase:authPassword"]);
+
+            List<Uri> links = new List<Uri>();
+            foreach (FileInfo file in new DirectoryInfo(@"Attachments").GetFiles())
+            {
+                string fileName = file.Name;
+                using (MemoryStream ms = new MemoryStream(File.ReadAllBytes($"Attachments/{fileName}")))
+                {
+                    FirebaseStorageTask task = new FirebaseStorage(configuration["Settings:Firebase:bucket"], new FirebaseStorageOptions
+                    {
+                        AuthTokenAsyncFactory = () => Task.FromResult(firebaseAuthLink.FirebaseToken),
+                    })
+                        .Child("sms-attachments")
+                        .Child(fileName)
+                        .PutAsync(ms);
+
+                    links.Add(new Uri(await task));
+                }
+            }
+
+            return links;
+        }
+
+
+        private async Task populateFacebookDataAndUpdateDb(FirebaseClient firebaseClent, string path, Credantials credantials, 
+             int index)
         {
 
             Dictionary<string, Data> OldDataFromFirebase = await GetDataFromFirebase(firebaseClent, path);
@@ -128,20 +183,33 @@ namespace FirebaseProvider
             List<Data> newDataFromFaceBook = await facebookProvider.GetDataFromFacebook(
                                              await facebookProvider.GetBrowserPage(), credantials.Subject);
 
+           await addNewItemsToFirebase(newDataFromFaceBook, path, OldDataFromFirebase,credantials, index);
+
+        }
+
+        private async Task addNewItemsToFirebase(List<Data> newDataFromFaceBook, string path, 
+            Dictionary<string, Data> OldDataFromFirebase, Credantials credantials, int index)
+        {
             foreach (Data item in newDataFromFaceBook)
                 await AddItemToFirebaseList(path,
                                     OldDataFromFirebase is null ? new List<Data>() :
                                     OldDataFromFirebase.Select(oldItem => oldItem.Value).ToList(),
                                     item,
-                                    configuration);
-
+                                    credantials,
+                                    index);
         }
 
-        private async Task<KeyValuePair<string, SubscriptionName>> isSubscribed(FirebaseClient firebaseClent, Credantials credantials) =>
-               (await GetSubscriptions(firebaseClent, credantials.Phone)).FirstOrDefault(x => x.Value?.Name == credantials.Subject);
-
+        private async Task<KeyValuePair<string, SubscriptionName>> isSubscribed(FirebaseClient firebaseClent, Credantials credantials)
+        {
+            KeyValuePair<string, SubscriptionName> responst = (await GetSubscriptions(firebaseClent, credantials.Phone))
+                                                               .FirstOrDefault(x => x.Value?.Name == credantials.Subject);
+            firebaseClent.Dispose();
+            return responst;
+        }
 
         private IFacebookProvider facebookProvider;
-
+        private ISmsProvider smsProvider;
+        private IConfiguration configuration;
+        private NetworkCredential networkCredential;
     }
 }
