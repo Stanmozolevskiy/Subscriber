@@ -14,7 +14,7 @@ When there are new listings available you will get an SMS/Email right away, that
 - [x] Pupoteer Sharp for scraping data
 - [x] FIrebase Database
 
-In this project I used the Provider architecture along with the dependency injection provided by .net5.
+In this project I used the Provider pattern along with the built in .net5 dependency injection.
 
 ![alt text](https://github.com/Stanmozolevskiy/Subscriber/blob/main/AplicationLogic.jpg)
 
@@ -22,3 +22,15 @@ In this project I used the Provider architecture along with the dependency injec
 <br>
 
 ![alt text](https://github.com/Stanmozolevskiy/Subscriber/blob/main/Subscriber_Arcitecture.jpg)
+
+# Deploy to Heroku with Docker
+
+Runt the following commands in the terminal with **adnim rights** in the root folder
+
+- **DOCKER**
+- ```docker build -t [projectname] .```
+- ```docker run -d -p 5000:80 --name myapp [projectname]```
+- ```heroku container:login```
+- ```docker build -t registry.heroku.com/[heroku-app-mane]/web .```
+- ```docker push registry.heroku.com/[heroku-app-mane]/web```
+- ```heroku container:release web --app [heroku-app-mane]```
