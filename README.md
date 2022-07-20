@@ -14,7 +14,7 @@ When there are new listings available you will get an SMS/Email right away, that
 - [x] Pupoteer Sharp for scraping data
 - [x] FIrebase Database
 
-In this project I used the Provider pattern along with the built in .net5 dependency injection.
+In this project I used the Provider Pattern along with the built in .net5 dependency injection.
 
 ![alt text](https://github.com/Stanmozolevskiy/Subscriber/blob/main/AplicationLogic.jpg)
 
